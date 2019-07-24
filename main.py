@@ -10,3 +10,6 @@ print(Fore.LIGHTWHITE_EX + "Key = " + Fore.LIGHTYELLOW_EX + config.key + Fore.RE
       + Fore.LIGHTWHITE_EX + "EndPoint = " + config.endpoint)
 
 AzurRequest.request_detect(config, "https://cdn.images.express.co.uk/img/dynamic/130/750x445/900176.jpg")
+AzurRequest.request_create_largefacelist(config, "test1", "ugh", "description ugh")
+AzurRequest.request_list_largefacelist(config)
+AzurRequest.request_delete_largefacelist(config, "test1")
