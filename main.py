@@ -24,6 +24,3 @@ for faceId in json.loads(data):
     faceIds.append(faceId['faceId'])
 # [REQUEST] GROUP
 AzurRequest.request_group(config, faceIds)
-
-
-
