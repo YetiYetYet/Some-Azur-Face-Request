@@ -222,3 +222,252 @@ def request_group(config: Config.Config, faces_ids: List[str]) -> json:
         return {}
 
 # def request_find_similar(config, face_ids):
+
+
+def request_add_face(config: Config.Config, largefacelist_id: str, url: str) -> json:
+    """
+    This function send a [POST]request to the microsoft API
+    Add a face to a specified large face list, up to 1,000,000 faces.
+
+    https://northeurope.dev.cognitive.microsoft.com/docs/services/563879b61984550e40cbbe8d/operations/5a158c10d2de3616c086f2d3
+
+    :param config: object containing mandatory information for request (subscription Key and endpoint).
+    :param largefacelist_id: the id of the LargeFaceList where you want to add face.
+    :param url: The url of the images (need images extensions like .png...).
+    :return: Json File with the persitedfaceid(Empty if something wrong append).
+    """
+    headers = {
+        # Request headers
+        'Content-Type': 'application/json',
+        'Ocp-Apim-Subscription-Key': config.key,
+    }
+
+    data = {
+        # Json content
+        "url": url
+    }
+
+    url = config.endpoint + "/largefacelists/" + str(largefacelist_id) + "/persistedfaces"
+    print(Fore.LIGHTWHITE_EX + "[REQUETE]" + Fore.YELLOW + "[POST]" + Fore.LIGHTWHITE_EX + " Add Face")
+
+    try:
+        request = requests.post(url, headers=headers, data=json.dumps(data, indent=4))
+        if request.status_code == 200:
+            print(Fore.GREEN + "[REQUETE] Add Face ok")
+            print(json.dumps(request.json(), indent=4))
+            return json.dumps(request.json(), indent=4)
+        else:
+            print(Fore.RED + "[REQUETE] Add Face Fail : " + request.status_code)
+            print(Fore.RED + json.dumps(request.json(), indent=4))
+            return {}
+
+    except HTTPError as http_err:
+        print(Fore.RED + f'HTTP error occurred: {http_err}')
+        return {}
+    except Exception as err:
+        print(Fore.RED + f'Other error occurred: {err}')
+        return {}
+
+
+def request_train_largefacelist(config: Config.Config, largefacelist_id: str) -> bool:
+    """
+    This function send a [GET]request to the microsoft API
+    Submit a large face list training task. Training is a crucial step that only a trained large face list can be used
+    by Face - Find Similar.
+
+    https://northeurope.dev.cognitive.microsoft.com/docs/services/563879b61984550e40cbbe8d/operations/5a158422d2de3616c086f2d1
+
+    :param config: object containing mandatory information for request (subscription Key and endpoint).
+    :param largefacelist_id: largeFaceListId of the target large face list to be trained.
+    :return: Boolean : True if everything is ok or False when someting wrong append.
+    """
+    headers = {
+        # Request headers
+        'Content-Type': 'application/json',
+        'Ocp-Apim-Subscription-Key': config.key,
+    }
+
+    url = config.endpoint + '/largefacelists/' + largefacelist_id + '/train'
+    print(url)
+    print(Fore.LIGHTWHITE_EX + "[REQUETE]" + Fore.YELLOW + "[POST]" + Fore.LIGHTWHITE_EX + " Train LargeFaceList")
+
+    try:
+        request = requests.get(url, headers=headers)
+        if request.status_code == 200:
+            print(Fore.GREEN + "[REQUETE] Train LargeFaceList ok")
+            return True
+        else:
+            print(Fore.RED + "[REQUETE] Train LargeFaceList Fail : " + request.status_code)
+            print(Fore.RED + json.dumps(request.json(), indent=4))
+            return False
+
+    except HTTPError as http_err:
+        print(Fore.RED + f'HTTP error occurred: {http_err}')
+        return False
+    except Exception as err:
+        print(Fore.RED + f'Other error occurred: {err}')
+        return False
+
+
+def request_get_train_status(config: Config.Config, largefacelist_id: str) -> json:
+    """
+    This function send a [GET]request to the microsoft API
+    To check the large face list training status completed or still ongoing. LargeFaceList Training is an asynchronous
+    operation triggered by LargeFaceList - Train API. Training time depends on the number of face entries in a large
+    face list. It could be in seconds, or up to half an hour for 1,000,000 faces.
+
+    https://northeurope.dev.cognitive.microsoft.com/docs/services/563879b61984550e40cbbe8d/operations/5a1582f8d2de3616c086f2cf
+
+    :param config: object containing mandatory information for request (subscription Key and endpoint).
+    :param largefacelist_id: the id of the LargeFaceList where you want to add face.
+    :return: Json File with the persitedfaceid(Empty if something wrong append).
+    """
+    headers = {
+        # Request headers
+        'Content-Type': 'application/json',
+        'Ocp-Apim-Subscription-Key': config.key,
+    }
+
+    url = config.endpoint + "/largefacelists/" + str(largefacelist_id) + "/training"
+    print(Fore.LIGHTWHITE_EX + "[REQUETE]" + Fore.YELLOW + "[GET]" + Fore.LIGHTWHITE_EX + " Get Train Status")
+
+    try:
+        request = requests.get(url, headers=headers)
+        if request.status_code == 200:
+            print(Fore.GREEN + "[REQUETE] Get Training Status ok")
+            print(json.dumps(request.json(), indent=4))
+            return json.dumps(request.json(), indent=4)
+        else:
+            print(Fore.RED + "[REQUETE] Get Training Status Fail : " + request.status_code)
+            print(Fore.RED + json.dumps(request.json(), indent=4))
+            return {}
+
+    except HTTPError as http_err:
+        print(Fore.RED + f'HTTP error occurred: {http_err}')
+        return {}
+    except Exception as err:
+        print(Fore.RED + f'Other error occurred: {err}')
+        return {}
+
+
+def request_delete_face(config: Config.Config, largefacelist_id: str, persistedfaceid: str) -> bool:
+    """
+    This function send a [DELETE]request to the microsoft API
+    Delete a face from a large face list by specified largeFaceListId and persistedFaceId.
+
+    https://northeurope.dev.cognitive.microsoft.com/docs/services/563879b61984550e40cbbe8d/operations/5a158c8ad2de3616c086f2d4
+
+    :param config: object containing mandatory information for request (subscription Key and endpoint).
+    :param largefacelist_id: largeFaceListId of the target large face list to be trained.
+    :param persistedfaceid: persistedFaceId of an existing face. Obtain by Add Face Request
+    :return: Boolean : True if everything is ok or False when someting wrong append.
+    """
+    headers = {
+        # Request headers
+        'Content-Type': 'application/json',
+        'Ocp-Apim-Subscription-Key': config.key,
+    }
+
+    url = config.endpoint + "/" + str(largefacelist_id) + "/persistedfaces/" + str(persistedfaceid)
+    print(Fore.LIGHTWHITE_EX + "[REQUETE]" + Fore.YELLOW + "[DELETE]" + Fore.LIGHTWHITE_EX + " Delete Face")
+
+    try:
+        request = requests.get(url, headers=headers)
+        if request.status_code == 200:
+            print(Fore.GREEN + "[REQUETE] Delete Face ok")
+            return True
+        else:
+            print(Fore.RED + "[REQUETE] Delete Face Fail : " + request.status_code)
+            print(Fore.RED + json.dumps(request.json(), indent=4))
+            return False
+
+    except HTTPError as http_err:
+        print(Fore.RED + f'HTTP error occurred: {http_err}')
+        return False
+    except Exception as err:
+        print(Fore.RED + f'Other error occurred: {err}')
+        return False
+
+
+def request_findsimilar(config: Config.Config, largefacelist_id: str, faces_ids: List[str]) -> json:
+    """
+    This function send a [POST]request to the microsoft API
+    Given query face's faceId, to search the similar-looking faces from a faceId array, a facelist or a largefacelist.
+
+    https://northeurope.dev.cognitive.microsoft.com/docs/services/563879b61984550e40cbbe8d/operations/563879b61984550f30395237
+
+    :param config: object containing mandatory information for request (subscription Key and endpoint).
+    :param largefacelist_id: existing user-specified unique candidate large face list, created in LargeFaceListCreate.
+    :param faces_ids: Array of candidate faceId created by Face - Detect.
+    :return: Json File with an array of the most similar faces represented(Empty if something wrong append).
+    """
+    headers = {
+        # Request headers
+        'Content-Type': 'application/json',
+        'Ocp-Apim-Subscription-Key': config.key,
+    }
+
+    data = {
+        "faceIds": faces_ids,
+        "largeFaceListId": largefacelist_id,
+        "maxNumOfCandidatesReturned": 1000,
+    }
+
+    url = config.endpoint + "/findsimilars"
+    print(Fore.LIGHTWHITE_EX + "[REQUETE]" + Fore.YELLOW + "[POST]" + Fore.LIGHTWHITE_EX + " Find Similar")
+
+    try:
+        request = requests.post(url, data=json.dumps(data, indent=4), headers=headers)
+        if request.status_code == 200:
+            print(Fore.GREEN + "[REQUETE] Find Similar ok")
+            return json.dumps(request.json(), indent=4)
+        else:
+            print(Fore.RED + "[REQUETE] Find Similar Fail : " + request.status_code)
+            print(Fore.RED + json.dumps(request.json(), indent=4))
+            return {}
+
+    except HTTPError as http_err:
+        print(Fore.RED + f'HTTP error occurred: {http_err}')
+        return {}
+    except Exception as err:
+        print(Fore.RED + f'Other error occurred: {err}')
+        return {}
+
+
+def request_list_face(config: Config.Config, largefacelist_id: str) -> json:
+    """
+    This function send a [POST] request to the microsoft API
+    List faces' persistedFaceId and userData in a specified large face list.
+
+    https://northeurope.dev.cognitive.microsoft.com/docs/services/563879b61984550e40cbbe8d/operations/5a158db4d2de3616c086f2d6
+
+    :param config: object containing mandatory information for request (subscription Key and endpoint).
+    :param largefacelist_id: existing user-specified unique candidate large face list, created in LargeFaceListCreate.
+    :return: Json File with an array of faces(Empty if something wrong append).
+    """
+    headers = {
+        # Request headers
+        'Content-Type': 'application/json',
+        'Ocp-Apim-Subscription-Key': config.key,
+    }
+
+    url = config.endpoint + "/largefacelists/" + largefacelist_id + "/persistedfaces"
+    print(Fore.LIGHTWHITE_EX + "[REQUETE]" + Fore.YELLOW + "[POST]" + Fore.LIGHTWHITE_EX + " List Face")
+
+    try:
+        request = requests.get(url, headers=headers)
+        if request.status_code == 200:
+            print(Fore.GREEN + "[REQUETE] List Face ok")
+            print(json.dumps(request.json(), indent=4))
+            return json.dumps(request.json(), indent=4)
+        else:
+            print(Fore.RED + "[REQUETE] List Face Fail : " + request.status_code)
+            print(Fore.RED + json.dumps(request.json(), indent=4))
+            return {}
+
+    except HTTPError as http_err:
+        print(Fore.RED + f'HTTP error occurred: {http_err}')
+        return {}
+    except Exception as err:
+        print(Fore.RED + f'Other error occurred: {err}')
+        return {}
