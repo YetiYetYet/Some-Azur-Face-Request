@@ -8,7 +8,7 @@ from colorama import Fore, init
 
 init(autoreset=True)
 
-config = Config.Config("1dba96f8e6ae4363bc6bbf9a43708f86", "https://northeurope.api.cognitive.microsoft.com/face/v1.0")
+config = Config.Config("INSERTKEY HERE", "https://northeurope.api.cognitive.microsoft.com/face/v1.0")
 print(Fore.LIGHTWHITE_EX + "Key = " + Fore.LIGHTYELLOW_EX + config.key + Fore.RESET + "\n"
       + Fore.LIGHTWHITE_EX + "EndPoint = " + config.endpoint)
 
